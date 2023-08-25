@@ -1,0 +1,51 @@
+version: '3.7'
+services:
+  db_1:
+    container_name: postgres_db-test-1
+    image: postgres:11.5
+    environment:
+      POSTGRES_USER: db-test
+      POSTGRES_PASSWORD: db-test123
+    ports:
+      - "5435:5432"
+  db_2:
+    container_name: postgres_db-test-2
+    image: postgres:11.5
+    environment:
+      POSTGRES_USER: db-test
+      POSTGRES_PASSWORD: db-test123
+    ports:
+      - "5436:5432"
+  prometheus:
+    container_name: prometheus_db-test
+    image: prom/prometheus:v2.32.1
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+  grafana:
+    image: grafana/grafana:6.7.2
+    container_name: grafana_db-test
+    volumes:
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    labels:
+      org.label-schema.group: "monitoring"
+  blackbox_exporter:
+    image: prom/blackbox-exporter:v0.19.0
+    container_name: blackbox_exporter_db-test
+    ports:
+      - "9115:9115"
+    volumes:
+      - ./blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml
+    command:
+      - "--config.file=/etc/blackbox_exporter/config.yml"
+    restart: always
