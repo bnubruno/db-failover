@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    username: db-test
+    password: db-test123
+    url: jdbc:postgresql://localhost:5435,localhost:5436/db-test
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create
+    generate-ddl: true
+    show-sql: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
